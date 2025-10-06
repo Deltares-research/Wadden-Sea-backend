@@ -1,0 +1,381 @@
+@description('The location for all resources')
+param location string = resourceGroup().location
+
+@description('PostgreSQL server name')
+param postgresServerName string = 'psql-${uniqueString(resourceGroup().id)}'
+
+@description('PostgreSQL administrator username')
+param postgresAdminUsername string = 'psqladmin'
+
+@description('PostgreSQL administrator password')
+@secure()
+param postgresAdminPassword string
+
+@description('PostgreSQL database name')
+param databaseName string = 'appdb'
+
+@description('Container instance name')
+param containerInstanceName string = 'aci-${uniqueString(resourceGroup().id)}'
+
+@description('Container image to deploy')
+param containerImage string = 'mcr.microsoft.com/azuredocs/aci-helloworld:latest'
+
+@description('Number of CPU cores')
+param cpuCores int = 1
+
+@description('Memory in GB')
+param memoryInGb int = 2
+
+@description('Virtual Network name')
+param vnetName string = 'vnet-${uniqueString(resourceGroup().id)}'
+
+@description('PostgreSQL subnet name')
+param postgresSubnetName string = 'postgres-subnet'
+
+@description('Container subnet name')
+param containerSubnetName string = 'container-subnet'
+
+
+// cosmos db
+
+@description('Cosmos DB account name, max length 44 characters, lowercase')
+param accountName string = 'sql-${uniqueString(resourceGroup().id)}'
+
+
+@description('The primary region for the Cosmos DB account.')
+param primaryRegion string = 'westeurope'
+
+@description('The secondary region for the Cosmos DB account.')
+param secondaryRegion string = 'germanywestcentral'
+
+@description('The default consistency level of the Cosmos DB account.')
+@allowed([
+  'Eventual'
+  'ConsistentPrefix'
+  'Session'
+  'BoundedStaleness'
+  'Strong'
+])
+param defaultConsistencyLevel string = 'Session'
+
+@description('Max stale requests. Required for BoundedStaleness. Valid ranges, Single Region: 10 to 2147483647. Multi Region: 100000 to 2147483647.')
+@minValue(10)
+@maxValue(2147483647)
+param maxStalenessPrefix int = 100000
+
+@description('Max lag time (minutes). Required for BoundedStaleness. Valid ranges, Single Region: 5 to 84600. Multi Region: 300 to 86400.')
+@minValue(5)
+@maxValue(86400)
+param maxIntervalInSeconds int = 300
+
+@description('Enable system managed failover for regions')
+param systemManagedFailover bool = true
+
+@description('The name for the database')
+param cosmosdbName string = 'cosmosdb'
+
+@description('The name for the container')
+param containerName string = 'cosmoscontainer'
+
+@description('Maximum autoscale throughput for the container')
+@minValue(1000)
+@maxValue(1000000)
+param autoscaleMaxThroughput int = 1000
+
+
+
+
+// Virtual Network
+resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
+  name: vnetName
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        '10.0.0.0/16'
+      ]
+    }
+    subnets: [
+      {
+        name: postgresSubnetName
+        properties: {
+          addressPrefix: '10.0.1.0/24'
+          delegations: [
+            {
+              name: 'dlg-Microsoft.DBforPostgreSQL-flexibleServers'
+              properties: {
+                serviceName: 'Microsoft.DBforPostgreSQL/flexibleServers'
+              }
+            }
+          ]
+        }
+      }
+      {
+        name: containerSubnetName
+        properties: {
+          addressPrefix: '10.0.2.0/24'
+          delegations: [
+            {
+              name: 'dlg-Microsoft.ContainerInstance-containerGroups'
+              properties: {
+                serviceName: 'Microsoft.ContainerInstance/containerGroups'
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+
+// Private DNS Zone for PostgreSQL
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'privatelink.postgres.database.azure.com'
+  location: 'global'
+}
+
+// Link Private DNS Zone to Virtual Network
+resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: privateDnsZone
+  name: '${vnetName}-link'
+  location: 'global'
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: vnet.id
+    }
+  }
+}
+
+// PostgreSQL Flexible Server
+resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
+  name: postgresServerName
+  location: location
+  sku: {
+    name: 'Standard_B1ms' // define the price
+    tier: 'Burstable' // related to the price 
+  }
+  properties: {
+    administratorLogin: postgresAdminUsername
+    administratorLoginPassword: postgresAdminPassword
+    version: '15'
+    storage: {
+      storageSizeGB: 32
+    }
+    backup: {
+      backupRetentionDays: 7
+      geoRedundantBackup: 'Disabled'
+    }
+    network: {
+      delegatedSubnetResourceId: vnet.properties.subnets[0].id
+      privateDnsZoneArmResourceId: privateDnsZone.id
+    }
+    highAvailability: {
+      mode: 'Disabled'
+    }
+  }
+  dependsOn: [
+    privateDnsZoneLink
+  ]
+}
+
+// PostgreSQL Database
+resource database 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2023-03-01-preview' = {
+  parent: postgresServer
+  name: databaseName
+  properties: {
+    charset: 'UTF8'
+    collation: 'en_US.utf8'
+  }
+}
+
+// Container Instance
+resource containerInstance 'Microsoft.ContainerInstance/containerGroups@2023-05-01' = {
+  name: containerInstanceName
+  location: location
+  properties: {
+    containers: [
+      {
+        name: 'app-container'
+        properties: {
+          image: containerImage
+          resources: {
+            requests: {
+              cpu: cpuCores
+              memoryInGB: memoryInGb
+            }
+          }
+          environmentVariables: [
+            {
+              name: 'POSTGRES_HOST'
+              value: postgresServer.properties.fullyQualifiedDomainName
+            }
+            {
+              name: 'POSTGRES_PORT'
+              value: '5432'
+            }
+            {
+              name: 'POSTGRES_DATABASE'
+              value: databaseName
+            }
+            {
+              name: 'POSTGRES_USER'
+              value: postgresAdminUsername
+            }
+            {
+              name: 'POSTGRES_PASSWORD'
+              secureValue: postgresAdminPassword
+            }
+          ]
+        }
+      }
+    ]
+    osType: 'Linux'
+    restartPolicy: 'Always'
+    subnetIds: [
+      {
+        id: vnet.properties.subnets[1].id
+      }
+    ]
+  }
+}
+
+
+
+
+
+
+// cosmos db
+var consistencyPolicy = {
+  Eventual: {
+    defaultConsistencyLevel: 'Eventual'
+  }
+  ConsistentPrefix: {
+    defaultConsistencyLevel: 'ConsistentPrefix'
+  }
+  Session: {
+    defaultConsistencyLevel: 'Session'
+  }
+  BoundedStaleness: {
+    defaultConsistencyLevel: 'BoundedStaleness'
+    maxStalenessPrefix: maxStalenessPrefix
+    maxIntervalInSeconds: maxIntervalInSeconds
+  }
+  Strong: {
+    defaultConsistencyLevel: 'Strong'
+  }
+}
+var locations = [
+  {
+    locationName: primaryRegion
+    failoverPriority: 0
+    isZoneRedundant: false
+  }
+  {
+    locationName: secondaryRegion
+    failoverPriority: 1
+    isZoneRedundant: false
+  }
+]
+
+resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' = {
+  name: toLower(accountName)
+  kind: 'GlobalDocumentDB'
+  location: location
+  properties: {
+    consistencyPolicy: consistencyPolicy[defaultConsistencyLevel]
+    locations: locations
+    databaseAccountOfferType: 'Standard'
+    enableAutomaticFailover: systemManagedFailover
+  }
+}
+
+resource databaseCosmos 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15' = {
+  parent: account
+  name: cosmosdbName
+  properties: {
+    resource: {
+      id: cosmosdbName
+    }
+  }
+}
+
+resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2022-05-15' = {
+  parent: databaseCosmos
+  name: containerName
+  properties: {
+    resource: {
+      id: containerName
+      partitionKey: {
+        paths: [
+          '/myPartitionKey'
+        ]
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [
+          {
+            path: '/*'
+          }
+        ]
+        excludedPaths: [
+          {
+            path: '/myPathToNotIndex/*'
+          }
+          {
+            path: '/_etag/?'
+          }
+        ]
+        compositeIndexes: [
+          [
+            {
+              path: '/name'
+              order: 'ascending'
+            }
+            {
+              path: '/age'
+              order: 'descending'
+            }
+          ]
+        ]
+        spatialIndexes: [
+          {
+            path: '/path/to/geojson/property/?'
+            types: [
+              'Point'
+              'Polygon'
+              'MultiPolygon'
+              'LineString'
+            ]
+          }
+        ]
+      }
+      defaultTtl: 86400
+      uniqueKeyPolicy: {
+        uniqueKeys: [
+          {
+            paths: [
+              '/phoneNumber'
+            ]
+          }
+        ]
+      }
+    }
+    options: {
+      autoscaleSettings: {
+        maxThroughput: autoscaleMaxThroughput
+      }
+    }
+  }
+}
+
+
+
+// Outputs
+output postgresServerFqdn string = postgresServer.properties.fullyQualifiedDomainName
+output databaseName string = databaseName
+output containerInstanceName string = containerInstance.name
+output vnetId string = vnet.id
+
+output resourceId string = databaseCosmos.id
