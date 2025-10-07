@@ -1,10 +1,10 @@
-param aiFoundryName string = 'wadden-sea'
-param aiProjectName string = '${aiFoundryName}-proj'
-param location string = 'westeurope'
+param aiFoundryName string = 'wadden-sea-foundry'
+param aiProjectName string = 'wadden-sea-llm'
+param location string = 'francecentral'
 
 /*
   An AI Foundry resources is a variant of a CognitiveServices/account resource type
-*/ 
+*/
 resource aiFoundry 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
   name: aiFoundryName
   location: location
@@ -17,20 +17,20 @@ resource aiFoundry 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
   kind: 'AIServices'
   properties: {
     // required to work in AI Foundry
-    allowProjectManagement: true 
+    allowProjectManagement: true
 
     // Defines developer API endpoint subdomain
     customSubDomainName: aiFoundryName
 
     disableLocalAuth: false
-  } 
+  }
 }
 
 /*
   Developer APIs are exposed via a project, which groups in- and outputs that relate to one use case, including files.
   Its advisable to create one project right away, so development teams can directly get started.
   Projects may be granted individual RBAC permissions and identities on top of what account provides.
-*/ 
+*/
 resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-preview' = {
   name: aiProjectName
   parent: aiFoundry
