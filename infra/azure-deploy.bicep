@@ -1,8 +1,17 @@
 @description('The location for all resources')
 param location string = resourceGroup().location
 
+@description('vault name')
+param vaultName string = 'wadden-sea-vault'
+
+@description('tenantId')
+param tenantId string = subscription().tenantId
+
+@description('vault pricing tier parameter')
+param skuName string = 'standard'
+
 @description('PostgreSQL server name')
-param postgresServerName string = 'psql-${uniqueString(resourceGroup().id)}'
+param postgresServerName string = 'psql-wadden-sea'
 
 @description('PostgreSQL administrator username')
 param postgresAdminUsername string = 'psqladmin'
@@ -12,10 +21,10 @@ param postgresAdminUsername string = 'psqladmin'
 param postgresAdminPassword string
 
 @description('PostgreSQL database name')
-param databaseName string = 'appdb'
+param databaseName string = 'psql-db'
 
 @description('Container instance name')
-param containerInstanceName string = 'aci-${uniqueString(resourceGroup().id)}'
+param containerInstanceName string = 'llm-container'
 
 @description('Container image to deploy')
 param containerImage string = 'mcr.microsoft.com/azuredocs/aci-helloworld:latest'
@@ -27,7 +36,7 @@ param cpuCores int = 1
 param memoryInGb int = 2
 
 @description('Virtual Network name')
-param vnetName string = 'vnet-${uniqueString(resourceGroup().id)}'
+param vnetName string = 'virtual-net'
 
 @description('PostgreSQL subnet name')
 param postgresSubnetName string = 'postgres-subnet'
@@ -37,13 +46,8 @@ param containerSubnetName string = 'container-subnet'
 
 
 // cosmos db
-
 @description('Cosmos DB account name, max length 44 characters, lowercase')
-param accountName string = 'sql-${uniqueString(resourceGroup().id)}'
-
-
-@description('The primary region for the Cosmos DB account.')
-param primaryRegion string = 'westeurope'
+param accountName string = 'cosmos-db-wadden-sea'
 
 @description('The secondary region for the Cosmos DB account.')
 param secondaryRegion string = 'germanywestcentral'
@@ -75,7 +79,7 @@ param systemManagedFailover bool = true
 param cosmosdbName string = 'cosmosdb'
 
 @description('The name for the container')
-param containerName string = 'cosmoscontainer'
+param containerName string = 'cosmos-container'
 
 @description('Maximum autoscale throughput for the container')
 @minValue(1000)
@@ -267,7 +271,7 @@ var consistencyPolicy = {
 }
 var locations = [
   {
-    locationName: primaryRegion
+    locationName: location
     failoverPriority: 0
     isZoneRedundant: false
   }
@@ -370,6 +374,19 @@ resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/container
   }
 }
 
+resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
+  name: vaultName
+  location: location
+  properties: {
+    tenantId: tenantId
+    sku: {
+      family: 'A'
+      name: skuName
+    }
+    enableRbacAuthorization: true
+    publicNetworkAccess: 'Enabled'
+  }
+}
 
 
 // Outputs
