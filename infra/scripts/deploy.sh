@@ -11,5 +11,6 @@ az group create --name "$RG_NAME" --location "$LOCATION"
 az deployment group create \
   --resource-group "$RG_NAME" \
   --template-file infra/azure-deploy.bicep \
-  --parameters postgresAdminPassword="password is in the vault"
+  --parameters postgresAdminPassword="password is in the vault" \
+  --verbose --debug
 
