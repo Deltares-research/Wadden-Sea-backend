@@ -1,16 +1,31 @@
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
+from azure.core.exceptions import ResourceNotFoundError, HttpResponseError
+import os
+import logging
 
 class Vault:
     def __init__(self, vault_url: str):
         self.vault_url = vault_url
-        self.credential = DefaultAzureCredential()
-        self.client = SecretClient(vault_url=self.vault_url, credential=self.credential)
+        try:
+            self.credential = DefaultAzureCredential()
+            self.client = SecretClient(vault_url=self.vault_url, credential=self.credential)
+        except Exception as e:
+            logging.error(f"Failed to authenticate or initialize SecretClient: {e}")
+            raise
 
     def get_secret(self, secret_name: str):
-        secret = self.client.get_secret(secret_name)
-        return secret.value
-    
+        try:
+            secret = self.client.get_secret(secret_name)
+            return secret.value
+        except (ResourceNotFoundError, HttpResponseError) as e:
+            logging.warning(f"Secret not found in the Azure vault; trying in environmental variables. Details: {e}")
+            env = os.getenv(secret_name)
+            if (not env):
+                raise ValueError(f"Secret '{secret_name}' not found in Azure Key Vault or environment variables.")
+            return env
+           
+
     @property
     def deployment_endpoint(self):
         """Get the deployment endpoint for the LLM base models (llm and embedding) from Azure Key Vault"""
@@ -28,7 +43,7 @@ class Vault:
         return self.get_secret("Embedding-3-large-KEY")
     
     @property
-    def embedding_model(self):  
+    def embedding_model(self):
         """Get the embedding model name from Azure Key Vault"""
         return self.get_secret("EMBEDDING-MODEL")
     
