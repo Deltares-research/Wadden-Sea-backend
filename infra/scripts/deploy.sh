@@ -12,4 +12,5 @@ az deployment group create \
                   acrUsername="$ACR_NAME" \
                   acrPassword='in the vault' \
                   postgresAdminPassword='in the vault' \
+                  apiKey='open-ai model api key' \
     --verbose --debug
