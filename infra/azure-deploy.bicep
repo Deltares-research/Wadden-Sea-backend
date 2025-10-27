@@ -107,6 +107,10 @@ param containerName string = 'cosmos-container'
 @maxValue(1000000)
 param autoscaleMaxThroughput int = 1000
 
+@description('API Key for the application')
+@secure()
+param apiKey string
+
 // Virtual Network
 resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
   name: vnetName
@@ -217,7 +221,7 @@ resource database 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2023-03-0
   }
 }
 
-// Container Instance
+// Container Instance with secure environment variable
 resource containerInstance 'Microsoft.ContainerInstance/containerGroups@2023-05-01' = {
   name: containerInstanceName
   location: location
@@ -259,6 +263,10 @@ resource containerInstance 'Microsoft.ContainerInstance/containerGroups@2023-05-
             {
               name: 'POSTGRES_PASSWORD'
               secureValue: postgresAdminPassword
+            }
+            {
+              name: 'API_KEY'
+              secureValue: apiKey
             }
           ]
         }
