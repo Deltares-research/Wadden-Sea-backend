@@ -16,13 +16,7 @@ packages = [{ include = "llm", from = "src"}]
 [tool.poetry.dependencies]
 python = ">=3.12,<4"
 python-dotenv = "^1.0.1"
-llama-index = "^0.12.36"
 vfn-rag = {git = "https://github.com/Deltares-research/vfn-rag", rev = "0.2.0"}
-
-
-[tool.poetry.group.llm.dependencies]
-llama-index-llms-azure-openai = "^0.3.2"
-llama-index-embeddings-azure-openai = "^0.3.5"
 
 
 [tool.poetry.group.analysis.dependencies]
