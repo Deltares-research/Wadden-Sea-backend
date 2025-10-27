@@ -7,5 +7,5 @@ RG_NAME="${RG_NAME:-waddensea}"
 az deployment group what-if \
   --resource-group "$RG_NAME" \
   --template-file infra/azure-deploy.bicep \
-  --parameters postgresAdminPassword="YourSecurePassword123!"
+  --parameters postgresAdminPassword="in the vault!"
 
