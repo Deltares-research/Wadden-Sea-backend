@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-RG_NAME="${RG_NAME:-waddensea}"
+RG_NAME="${RG_NAME:-wadden-sea}"
 
 # create deployment
 az deployment group what-if \
