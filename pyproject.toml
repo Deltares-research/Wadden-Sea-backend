@@ -17,6 +17,7 @@ packages = [{ include = "llm", from = "src"}]
 python = ">=3.12,<4"
 python-dotenv = "^1.0.1"
 llama-index = "^0.12.36"
+vfn-rag = {git = "https://github.com/Deltares-research/vfn-rag", rev = "0.2.0"}
 
 
 [tool.poetry.group.llm.dependencies]
