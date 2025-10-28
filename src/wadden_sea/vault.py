@@ -16,6 +16,7 @@ SECRET_NAMES: Dict[str, str] = {
     "postgres_password": "POSTGRES-PASSWORD",
 }
 
+
 class Vault:
     """
     Vault is a utility class for securely retrieving secrets from Azure Key Vault, with a fallback to environment variables.

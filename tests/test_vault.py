@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch, MagicMock
 import pytest
 
-from llm.vault import Vault
+from wadden_sea.vault import Vault
 
 
 class DummySecret:

@@ -8,7 +8,7 @@ readme = "README.md"
 keywords = ["llm", "generativeai", "chatbot", "rag", "natural language processing"]
 repository = "https://github.com/Deltares-research/Wadden-Sea-backend"
 
-packages = [{ include = "llm", from = "src"}]
+packages = [{ include = "wadden_sea", from = "src"}]
 
 
 [tool.poetry.urls]
