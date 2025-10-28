@@ -8,7 +8,7 @@ readme = "README.md"
 keywords = ["llm", "generativeai", "chatbot", "rag", "natural language processing"]
 repository = "https://github.com/Deltares-research/Wadden-Sea-backend"
 
-packages = [{ include = "llm", from = "src"}]
+packages = [{ include = "wadden_sea", from = "src"}]
 
 
 [tool.poetry.urls]
@@ -17,6 +17,7 @@ packages = [{ include = "llm", from = "src"}]
 python = ">=3.12,<4"
 python-dotenv = "^1.0.1"
 vfn-rag = {git = "https://github.com/Deltares-research/vfn-rag", rev = "0.2.0"}
+azure-keyvault-secrets = "^4.10.0"
 
 
 [tool.poetry.group.analysis.dependencies]
