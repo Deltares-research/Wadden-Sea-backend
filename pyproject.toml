@@ -44,6 +44,11 @@ fail_under = 10
 
 [tool.pytest.ini_options]
 addopts = [ "--cov"]
+markers = [
+    "e2e: marks tests as end-to-end tests (deselect with '-m \"not e2e\"')",
+    "unit: marks a test as unit test(deselect with '-m \"not unit\"')",
+    "integration: marks a test as integration test (deselect with '-m \"not integration\"')",
+]
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]
