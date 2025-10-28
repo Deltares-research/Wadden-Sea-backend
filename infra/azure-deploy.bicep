@@ -1,8 +1,17 @@
 @description('The location for all resources')
 param location string = resourceGroup().location
 
+@description('vault name')
+param vaultName string = 'wadden-sea-vault'
+
+@description('tenantId')
+param tenantId string = subscription().tenantId
+
+@description('vault pricing tier parameter')
+param skuName string = 'standard'
+
 @description('PostgreSQL server name')
-param postgresServerName string = 'psql-${uniqueString(resourceGroup().id)}'
+param postgresServerName string = 'psql-wadden-sea'
 
 @description('PostgreSQL administrator username')
 param postgresAdminUsername string = 'psqladmin'
@@ -12,13 +21,23 @@ param postgresAdminUsername string = 'psqladmin'
 param postgresAdminPassword string
 
 @description('PostgreSQL database name')
-param databaseName string = 'appdb'
+param databaseName string = 'psql-db'
 
 @description('Container instance name')
-param containerInstanceName string = 'aci-${uniqueString(resourceGroup().id)}'
+param containerInstanceName string = 'llm-container'
 
 @description('Container image to deploy')
-param containerImage string = 'mcr.microsoft.com/azuredocs/aci-helloworld:latest'
+param containerImage string = 'waddencr.azurecr.io/vfn-rag:latest'
+
+@description('Azure Container Registry name (optional)')
+param acrName string = ''
+
+@description('ACR username (optional)')
+param acrUsername string = ''
+
+@description('ACR password (optional)')
+@secure()
+param acrPassword string = ''
 
 @description('Number of CPU cores')
 param cpuCores int = 1
@@ -26,8 +45,11 @@ param cpuCores int = 1
 @description('Memory in GB')
 param memoryInGb int = 2
 
+@description('External Port.')
+param port int = 80
+
 @description('Virtual Network name')
-param vnetName string = 'vnet-${uniqueString(resourceGroup().id)}'
+param vnetName string = 'virtual-net'
 
 @description('PostgreSQL subnet name')
 param postgresSubnetName string = 'postgres-subnet'
@@ -35,15 +57,18 @@ param postgresSubnetName string = 'postgres-subnet'
 @description('Container subnet name')
 param containerSubnetName string = 'container-subnet'
 
+@description('Load Balancer subnet name')
+param lbSubnetName string = 'lb-subnet'
+
+@description('Load Balancer name')
+param loadBalancerName string = 'wadden-sea-lb'
+
+@description('Public IP name for Load Balancer')
+param publicIPName string = 'lb-public-ip'
 
 // cosmos db
-
 @description('Cosmos DB account name, max length 44 characters, lowercase')
-param accountName string = 'sql-${uniqueString(resourceGroup().id)}'
-
-
-@description('The primary region for the Cosmos DB account.')
-param primaryRegion string = 'westeurope'
+param accountName string = 'cosmos-db-wadden-sea'
 
 @description('The secondary region for the Cosmos DB account.')
 param secondaryRegion string = 'germanywestcentral'
@@ -75,15 +100,16 @@ param systemManagedFailover bool = true
 param cosmosdbName string = 'cosmosdb'
 
 @description('The name for the container')
-param containerName string = 'cosmoscontainer'
+param containerName string = 'cosmos-container'
 
 @description('Maximum autoscale throughput for the container')
 @minValue(1000)
 @maxValue(1000000)
 param autoscaleMaxThroughput int = 1000
 
-
-
+@description('API Key for the application')
+@secure()
+param apiKey string
 
 // Virtual Network
 resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
@@ -124,6 +150,12 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
           ]
         }
       }
+      {
+        name: lbSubnetName
+        properties: {
+          addressPrefix: '10.0.3.0/24'
+        }
+      }
     ]
   }
 }
@@ -152,8 +184,8 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-pr
   name: postgresServerName
   location: location
   sku: {
-    name: 'Standard_B1ms' // define the price
-    tier: 'Burstable' // related to the price 
+    name: 'Standard_B1ms'
+    tier: 'Burstable'
   }
   properties: {
     administratorLogin: postgresAdminUsername
@@ -189,7 +221,7 @@ resource database 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2023-03-0
   }
 }
 
-// Container Instance
+// Container Instance with secure environment variable
 resource containerInstance 'Microsoft.ContainerInstance/containerGroups@2023-05-01' = {
   name: containerInstanceName
   location: location
@@ -199,6 +231,12 @@ resource containerInstance 'Microsoft.ContainerInstance/containerGroups@2023-05-
         name: 'app-container'
         properties: {
           image: containerImage
+          ports: [
+            {
+              port: port
+              protocol: 'TCP'
+            }
+          ]
           resources: {
             requests: {
               cpu: cpuCores
@@ -226,12 +264,32 @@ resource containerInstance 'Microsoft.ContainerInstance/containerGroups@2023-05-
               name: 'POSTGRES_PASSWORD'
               secureValue: postgresAdminPassword
             }
+            {
+              name: 'API_KEY'
+              secureValue: apiKey
+            }
           ]
         }
       }
     ]
+    imageRegistryCredentials: !empty(acrName) ? [
+      {
+        server: '${acrName}.azurecr.io'
+        username: acrUsername
+        password: acrPassword
+      }
+    ] : []
     osType: 'Linux'
     restartPolicy: 'Always'
+    ipAddress: {
+      type: 'Private'
+      ports: [
+        {
+          port: port
+          protocol: 'TCP'
+        }
+      ]
+    }
     subnetIds: [
       {
         id: vnet.properties.subnets[1].id
@@ -240,10 +298,95 @@ resource containerInstance 'Microsoft.ContainerInstance/containerGroups@2023-05-
   }
 }
 
+// Public IP for Load Balancer
+resource publicIP 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
+  name: publicIPName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    dnsSettings: {
+      domainNameLabel: toLower('${loadBalancerName}-${uniqueString(resourceGroup().id)}')
+    }
+  }
+}
 
-
-
-
+// Load Balancer
+resource loadBalancer 'Microsoft.Network/loadBalancers@2023-05-01' = {
+  name: loadBalancerName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    frontendIPConfigurations: [
+      {
+        name: 'LoadBalancerFrontEnd'
+        properties: {
+          publicIPAddress: {
+            id: publicIP.id
+          }
+        }
+      }
+    ]
+    backendAddressPools: [
+      {
+        name: 'BackendPool'
+        properties: {
+          loadBalancerBackendAddresses: [
+            {
+              name: 'container-backend'
+              properties: {
+                ipAddress: containerInstance.properties.ipAddress.ip
+                virtualNetwork: {
+                  id: vnet.id
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+    loadBalancingRules: [
+      {
+        name: 'HttpRule'
+        properties: {
+          frontendIPConfiguration: {
+            id: resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', loadBalancerName, 'LoadBalancerFrontEnd')
+          }
+          backendAddressPool: {
+            id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', loadBalancerName, 'BackendPool')
+          }
+          probe: {
+            id: resourceId('Microsoft.Network/loadBalancers/probes', loadBalancerName, 'HealthProbe')
+          }
+          protocol: 'Tcp'
+          frontendPort: 80
+          backendPort: port
+          enableFloatingIP: false
+          idleTimeoutInMinutes: 4
+          enableTcpReset: true
+        }
+      }
+    ]
+    probes: [
+      {
+        name: 'HealthProbe'
+        properties: {
+          protocol: 'Tcp'
+          port: port
+          intervalInSeconds: 5
+          numberOfProbes: 2
+        }
+      }
+    ]
+  }
+  dependsOn: [
+    containerInstance
+  ]
+}
 
 // cosmos db
 var consistencyPolicy = {
@@ -267,7 +410,7 @@ var consistencyPolicy = {
 }
 var locations = [
   {
-    locationName: primaryRegion
+    locationName: location
     failoverPriority: 0
     isZoneRedundant: false
   }
@@ -370,12 +513,25 @@ resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/container
   }
 }
 
-
+resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
+  name: vaultName
+  location: location
+  properties: {
+    tenantId: tenantId
+    sku: {
+      family: 'A'
+      name: skuName
+    }
+    enableRbacAuthorization: true
+    publicNetworkAccess: 'Enabled'
+  }
+}
 
 // Outputs
 output postgresServerFqdn string = postgresServer.properties.fullyQualifiedDomainName
 output databaseName string = databaseName
 output containerInstanceName string = containerInstance.name
 output vnetId string = vnet.id
-
 output resourceId string = databaseCosmos.id
+output loadBalancerPublicIP string = publicIP.properties.ipAddress
+output loadBalancerFqdn string = publicIP.properties.dnsSettings.fqdn

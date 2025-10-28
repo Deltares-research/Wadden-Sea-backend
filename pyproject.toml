@@ -16,12 +16,7 @@ packages = [{ include = "wadden_sea", from = "src"}]
 [tool.poetry.dependencies]
 python = ">=3.12,<4"
 python-dotenv = "^1.0.1"
-llama-index = "^0.12.36"
-
-
-[tool.poetry.group.llm.dependencies]
-llama-index-llms-azure-openai = "^0.3.2"
-llama-index-embeddings-azure-openai = "^0.3.5"
+vfn-rag = {git = "https://github.com/Deltares-research/vfn-rag", rev = "0.2.0"}
 azure-keyvault-secrets = "^4.10.0"
 
 
@@ -44,11 +39,6 @@ fail_under = 10
 
 [tool.pytest.ini_options]
 addopts = [ "--cov"]
-markers = [
-    "e2e: marks tests as end-to-end tests (deselect with '-m \"not e2e\"')",
-    "unit: marks a test as unit test(deselect with '-m \"not unit\"')",
-    "integration: marks a test as integration test (deselect with '-m \"not integration\"')",
-]
 
 [build-system]
 requires = ["setuptools", "poetry-core>=1.0.0"]

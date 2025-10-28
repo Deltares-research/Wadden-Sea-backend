@@ -1,0 +1,2 @@
+# Secrets 
+Secrets for container registry and the postgres database are stored in the [valut](https://portal.azure.com/#@deltares.onmicrosoft.com/resource/subscriptions/e11c79c4-17ab-4622-95a9-eeb3593ed11b/resourceGroups/wadden-sea/providers/Microsoft.KeyVault/vaults/wadden-sea-vault/overview)
