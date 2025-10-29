@@ -7,7 +7,7 @@ load_dotenv()
 
 from wadden_sea.api.query import process_query
 from wadden_sea.api.types import ENTITY_MAPPING
-
+from wadden_sea import __version__
 from vfn_rag.utils.models import azure_open_ai, get_azure_open_ai_embedding
 from vfn_rag.utils.config_loader import ConfigLoader
 
@@ -18,9 +18,9 @@ config_loader = ConfigLoader(llm, embed_model)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="VFN-RAG API",
-    description="RAG (Retrieval-Augmented Generation) API for voice-for-nature project",
-    version="1.0.0"
+    title="Wadden-Sea API",
+    description="Wadden-Sea LLM-RAG API",
+    version=__version__
 )
 
 # Pydantic models for request/response validation
