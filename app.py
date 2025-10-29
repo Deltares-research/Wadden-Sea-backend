@@ -93,7 +93,7 @@ def list_entities():
 def root():
     """Root endpoint with API information"""
     return {
-        "message": "VFN-RAG API is running",
+        "message": "Wadden-Sea API is running",
         "docs": "/docs",
         "health": "/health",
         "hello": "/hello",
