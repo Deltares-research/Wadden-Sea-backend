@@ -47,16 +47,16 @@ Once the FastAPI app is running, you can access:
 ### Build and Run Container
 ```bash
 # Build the Docker image and run the container
-docker build -t vfn-rag . && docker run -p 80:80 vfn-rag
+docker build -t wadden-sea . && docker run -p 80:80 wadden-sea
 ```
 
 ### Alternative: Build and Run Separately
 ```bash
 # Build the Docker image
-docker build -t vfn-rag .
+docker build -t wadden-sea .
 
 # Run the container
-docker run -p 80:80 vfn-rag
+docker run -p 80:80 wadden-sea
 ```
 
 ### Test the Container
@@ -68,5 +68,5 @@ Once the container is running, test the endpoints:
 ### Stop the Container
 ```bash
 # Stop the running container
-docker stop $(docker ps -q --filter ancestor=vfn-rag)
+docker stop $(docker ps -q --filter ancestor=wadden-sea)
 ```
