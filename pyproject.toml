@@ -26,6 +26,13 @@ uvicorn = {extras = ["standard"], version = "^0.24.0"}
 click = "^8.1.7"
 
 
+[tool.poetry.group.vfn_rag.dependencies]
+llama-index-llms-azure-openai = "^0.3.2"
+llama-index-embeddings-azure-openai = "^0.3.5"
+llama-index-vector-stores-azurecosmosnosql = "^1.3.0"
+azure-cosmos = "^4.5.0"
+
+
 [tool.poetry.group.analysis.dependencies]
 jupyterlab= "^4.0.0"
 
