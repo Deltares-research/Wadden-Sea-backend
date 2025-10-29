@@ -16,8 +16,8 @@ def test_get_secret_success():
     mock_client = MagicMock()
     mock_client.get_secret.return_value = DummySecret("super-secret-value")
 
-    with patch("llm.vault.DefaultAzureCredential") as mock_cred, \
-         patch("llm.vault.SecretClient") as mock_secret_client:
+    with patch("wadden_sea.vault.DefaultAzureCredential") as mock_cred, \
+         patch("wadden_sea.vault.SecretClient") as mock_secret_client:
         mock_cred.return_value = MagicMock()
         mock_secret_client.return_value = mock_client
 
@@ -39,8 +39,8 @@ def test_get_secret_fallback_to_env():
 
     mock_client.get_secret.side_effect = ResourceNotFoundError("not found")
 
-    with patch("llm.vault.DefaultAzureCredential") as mock_cred, \
-         patch("llm.vault.SecretClient") as mock_secret_client:
+    with patch("wadden_sea.vault.DefaultAzureCredential") as mock_cred, \
+         patch("wadden_sea.vault.SecretClient") as mock_secret_client:
         mock_cred.return_value = MagicMock()
         mock_secret_client.return_value = mock_client
 
@@ -67,8 +67,8 @@ def test_get_secret_missing_raises():
 
     mock_client.get_secret.side_effect = ResourceNotFoundError("not found")
 
-    with patch("llm.vault.DefaultAzureCredential") as mock_cred, \
-         patch("llm.vault.SecretClient") as mock_secret_client:
+    with patch("wadden_sea.vault.DefaultAzureCredential") as mock_cred, \
+         patch("wadden_sea.vault.SecretClient") as mock_secret_client:
         mock_cred.return_value = MagicMock()
         mock_secret_client.return_value = mock_client
 
@@ -82,8 +82,8 @@ def test_get_secret_missing_raises():
 @pytest.mark.mock
 def test_init_raises_when_client_fails():
     # Simulate SecretClient raising during initialization
-    with patch("llm.vault.DefaultAzureCredential") as mock_cred, \
-         patch("llm.vault.SecretClient") as mock_secret_client:
+    with patch("wadden_sea.vault.DefaultAzureCredential") as mock_cred, \
+         patch("wadden_sea.vault.SecretClient") as mock_secret_client:
         mock_cred.return_value = MagicMock()
         mock_secret_client.side_effect = Exception("init failed")
 
