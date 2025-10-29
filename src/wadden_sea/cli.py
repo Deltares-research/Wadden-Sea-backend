@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 # Load environment variables early
 load_dotenv()
 
-from wadden_sea.api.services.query import process_query
-from wadden_sea.api.config.entities import ENTITY_MAPPING
+from wadden_sea.api.query import process_query
+from wadden_sea.api.types import ENTITY_MAPPING
 
 
 @click.group()
