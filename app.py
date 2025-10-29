@@ -42,15 +42,15 @@ class HelloResponse(BaseModel):
 @app.get("/health")
 def health_check():
     """Health check endpoint for container monitoring"""
-    return {"status": "healthy", "service": "vfn-rag"}
+    return {"status": "healthy", "service": "wadden-sea"}
 
 # Hello world endpoint
 @app.get("/hello", response_model=HelloResponse)
 def hello_world():
     """Simple hello world endpoint"""
     return HelloResponse(
-        message="Hello World from vfn-rag container!",
-        service="vfn-rag"
+        message="Hello World from wadden-sea container!",
+        service="wadden-sea"
     )
 
 # RAG query endpoint
