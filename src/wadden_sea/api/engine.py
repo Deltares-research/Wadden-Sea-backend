@@ -6,6 +6,7 @@ from azure.cosmos import CosmosClient
 from llama_index.core import VectorStoreIndex
 from vfn_rag.retrieval.cosmos import Cosmos
 from llama_index.core.settings import Settings
+from wadden_sea.api.types import EntityConfig
 
 _client: Optional[CosmosClient] = None
 
@@ -49,13 +50,15 @@ def reset_client():
 
 
 
-def get_or_load_index(config: "EntityConfig") -> VectorStoreIndex:
+def get_or_load_index(entity: str, config: EntityConfig) -> VectorStoreIndex:
     """Load index for an entity from Cosmos DB.
 
     This function always loads fresh data from Cosmos DB on every call.
 
     Parameters
     ----------
+    entity: str
+        The entity name
     config: EntityConfig
         The entity configuration
 
