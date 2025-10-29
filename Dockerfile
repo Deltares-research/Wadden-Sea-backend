@@ -7,18 +7,20 @@ WORKDIR /app
 # Install Poetry
 RUN pip install poetry
 
+# Configure Poetry
+RUN poetry config virtualenvs.create false
+
 # Copy Poetry files
 COPY pyproject.toml poetry.lock ./
 
-# Install dependencies with Poetry (without installing the current project)
-RUN poetry config virtualenvs.create false && \
-    poetry install --only=main --no-root
-
 # Copy application code
 COPY . .
+
+# Install all dependencies including the llm group and the package itself
+RUN poetry install --with=llm --no-interaction
 
 # Expose port 80
 EXPOSE 80
 
 # Run the application
-CMD ["python", "api/app.py"]
+CMD ["python", "app.py"]
