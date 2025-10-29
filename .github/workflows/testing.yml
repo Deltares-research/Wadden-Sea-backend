@@ -42,9 +42,13 @@ jobs:
         run: poetry install
         if: steps.cache.outputs.cache-hit != 'true'
 
-      - name: Run tests
+      - name: list env contents
         run: |
-          poetry run pytest
+          poetry show
+          pip list
+
+      - name: Test with pytest
+        run: poetry run pytest --cov src/ --cov-report xml:coverage-reports/coverage-wadden-sea.xml  --junitxml=xunit-reports/xunit-result-wadden-sea.xml
 
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v3
