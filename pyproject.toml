@@ -10,6 +10,8 @@ repository = "https://github.com/Deltares-research/Wadden-Sea-backend"
 
 packages = [{ include = "wadden_sea", from = "src"}]
 
+[tool.poetry.scripts]
+wadden-sea = "wadden_sea.cli:cli"
 
 [tool.poetry.urls]
 
