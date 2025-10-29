@@ -1,5 +1,5 @@
 services:
-  vfn-rag:
+  wadden-sea:
     build: .
     ports:
       - "80:80"
