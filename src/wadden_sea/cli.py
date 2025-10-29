@@ -1,7 +1,8 @@
 """
-CLI commands for VFN-RAG
+CLI commands for Wadden-Sea
 """
 import click
+from wadden_sea import __version__
 from dotenv import load_dotenv
 
 # Load environment variables early
@@ -13,7 +14,7 @@ from wadden_sea.api.types import ENTITY_MAPPING
 
 @click.group()
 def cli():
-    """VFN-RAG Command Line Interface"""
+    """Wadden-Sea Command Line Interface"""
     pass
 
 
@@ -21,7 +22,7 @@ def cli():
 @click.option('--name', default='World', help='Name to greet')
 def hello(name: str):
     """Print hello world message"""
-    click.echo(f"Hello {name} from vfn-rag!")
+    click.echo(f"Hello {name} from wadden-sea!")
 
 
 @cli.command()
@@ -63,7 +64,7 @@ def query(query: str, entity: str):
 @cli.command()
 def version():
     """Show version information"""
-    click.echo("VFN-RAG CLI v1.0.0")
+    click.echo(f"Wadden-Sea CLI {__version__}")
 
 
 if __name__ == '__main__':
