@@ -17,7 +17,7 @@ COPY pyproject.toml poetry.lock ./
 COPY . .
 
 # Install all dependencies including the llm group and the package itself
-RUN poetry install --with=llm --no-interaction
+RUN poetry install --with vfn_rag --no-interaction
 
 # Expose port 80
 EXPOSE 80
