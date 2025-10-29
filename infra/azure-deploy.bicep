@@ -27,7 +27,7 @@ param databaseName string = 'psql-db'
 param containerInstanceName string = 'llm-container'
 
 @description('Container image to deploy')
-param containerImage string = 'waddencr.azurecr.io/vfn-rag:latest'
+param containerImage string = 'waddencr.azurecr.io/wadden-sea-backend:latest'
 
 @description('Azure Container Registry name (optional)')
 param acrName string = ''
