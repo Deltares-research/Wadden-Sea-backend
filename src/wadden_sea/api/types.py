@@ -7,10 +7,14 @@ class EntityConfig(NamedTuple):
     """Configuration for an entity knowledge base.
     
     Attributes:
-        grounded_prompt: The prompt to prepend to queries for this entity (optional)
-        database_name: The Azure Cosmos DB database name
-        container_name: The container name within the database
-        description: Human-readable description of the entity
+        grounded_prompt:
+            The prompt to prepend to queries for this entity (optional)
+        database_name:
+            The Azure Cosmos DB database name
+        container_name:
+            The container name within the database
+        description:
+            Human-readable description of the entity
     """
     grounded_prompt: Optional[str]
     database_name: str
