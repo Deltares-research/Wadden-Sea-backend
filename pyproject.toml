@@ -18,6 +18,7 @@ python = ">=3.12,<4"
 python-dotenv = "^1.0.1"
 vfn-rag = {git = "https://github.com/Deltares-research/vfn-rag", branch = "main"}
 azure-keyvault-secrets = "^4.10.0"
+azure-identity = "^1.19.0"
 fastapi = "^0.104.1"
 uvicorn = {extras = ["standard"], version = "^0.24.0"}
 
