@@ -299,6 +299,7 @@ resource containerInstance 'Microsoft.ContainerInstance/containerGroups@2023-05-
 }
 
 // Public IP for Load Balancer
+// static public IP address that serves as the internet-facing entry point
 resource publicIP 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
   name: publicIPName
   location: location
