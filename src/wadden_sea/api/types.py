@@ -23,11 +23,11 @@ class EntityConfig(NamedTuple):
 
 
 ENTITY_MAPPING = {
-    "seal": EntityConfig(
-        grounded_prompt="Pretend that you are a seal in the wadden sea and give truthful answers based on the report data. Do not hallucinate if no information is available.",
+    "shellfish": EntityConfig(
+        grounded_prompt="Pretend that you are a shellfish in the wadden sea and give truthful answers based on the report data. Do not hallucinate if no information is available.",
         database_name="vectorSearchDB",
-        container_name="seal_vectorSearchContainer",
-        description="Seal knowledge base"
+        container_name="shellfishContainer",
+        description="Shellfish knowledge base"
     ),
     "seagrass": EntityConfig(
         grounded_prompt="Pretend that you are seagrass in the wadden sea and give truthful answers based on the report data. Do not hallucinate if no information is available.",
