@@ -23,9 +23,9 @@ poetry run uvicorn app:app --host 0.0.0.0 --port 80 --reload
 ### Method 3: Using CLI commands
 ```bash
 # Test CLI commands
-poetry run vfn-rag hello
-poetry run vfn-rag version
-poetry run vfn-rag query --query "test query"
+poetry run wadden-sea hello
+poetry run wadden-sea version
+poetry run wadden-sea query --query "test query"
 ```
 
 ## API Endpoints
