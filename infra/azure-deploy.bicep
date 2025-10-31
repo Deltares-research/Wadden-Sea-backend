@@ -27,7 +27,7 @@ param databaseName string = 'psql-db'
 param containerInstanceName string = 'llm-container'
 
 @description('Container image to deploy')
-param containerImage string = 'waddencr.azurecr.io/vfn-rag:latest'
+param containerImage string = 'waddencr.azurecr.io/wadden-sea-backend:latest'
 
 @description('Azure Container Registry name (optional)')
 param acrName string = ''
@@ -299,6 +299,7 @@ resource containerInstance 'Microsoft.ContainerInstance/containerGroups@2023-05-
 }
 
 // Public IP for Load Balancer
+// static public IP address that serves as the internet-facing entry point
 resource publicIP 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
   name: publicIPName
   location: location

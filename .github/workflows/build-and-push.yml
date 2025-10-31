@@ -1,0 +1,50 @@
+name: Build and Push Docker Image
+
+on:
+  release:
+    types: [created, published]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY_URL: waddencr.azurecr.io 
+      IMAGE_NAME: wadden-sea-backend
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker image with docker-compose
+      run: docker-compose build wadden-sea
+
+    - name: Get version
+      id: get-version
+      run: |
+        VERSION="${{ github.event.release.tag_name }}"
+        if [ -z "$VERSION" ]; then
+          echo "Error: github.event.release.tag_name is empty"
+          exit 1
+        fi
+        echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+        echo "Version: ${VERSION}"
+    - name: Tag Docker image
+      run: |
+        docker tag wadden-sea-backend_wadden-sea:latest ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.get-version.outputs.VERSION }}
+        docker tag wadden-sea-backend_wadden-sea:latest ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:latest
+        # to be removed when fixing the wadden-sea-backend image in ACR
+        docker tag wadden-sea-backend_wadden-sea:latest ${{ env.REGISTRY_URL }}/vfn-rag:latest
+    - name: Login to Azure Container Registry
+      run: |
+        docker login ${{ env.REGISTRY_URL }} -u ${{ secrets.ACR_USERNAME }} -p ${{ secrets.ACR_PASSWORD }}
+    - name: Push images to Azure Container Registry
+      run: |
+        docker push ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.get-version.outputs.VERSION }}
+        docker push ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:latest
+        # to be removed when fixing the wadden-sea-backend image in ACR
+        docker push waddencr.azurecr.io/vfn-rag:latest
+    - name: Show pushed images
+      run: |
+        echo "Successfully pushed:"
+        echo "- ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.get-version.outputs.VERSION }}"
+        echo "- ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:latest"
