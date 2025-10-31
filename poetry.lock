@@ -5098,7 +5098,7 @@ test = ["aiohttp (>=3.10.5)", "flake8 (>=6.1,<7.0)", "mypy (>=0.800)", "psutil",
 
 [[package]]
 name = "vfn-rag"
-version = "0.1.0"
+version = "0.3.0"
 description = "Overall package"
 optional = false
 python-versions = ">=3.12,<4"
@@ -5107,18 +5107,15 @@ files = []
 develop = false
 
 [package.dependencies]
-click = "^8.1.7"
-fastapi = "^0.104.1"
 llama-index = "^0.12.36"
 opencv-python = "^4.11.0.86"
 pydantic = "^2.5.0"
-uvicorn = {version = "^0.24.0", extras = ["standard"]}
 
 [package.source]
 type = "git"
 url = "https://github.com/Deltares-research/vfn-rag"
-reference = "0.2.0"
-resolved_reference = "4d4713ec488d9adb6ec6bde94f5a4f8ea804d217"
+reference = "0.3.0"
+resolved_reference = "35acaab0cd307626b39608db19eb9dcd458fe549"
 
 [[package]]
 name = "watchfiles"
@@ -5674,4 +5671,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4"
-content-hash = "d1813911ba435b48ab3f0998fca044f226943b49b8a0043a1d383149674209ee"
+content-hash = "1d768876b0090856b07790574b9600616a711f0ffa444401367ddd514e840729"

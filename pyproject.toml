@@ -18,7 +18,7 @@ wadden-sea = "wadden_sea.cli:cli"
 [tool.poetry.dependencies]
 python = ">=3.12,<4"
 python-dotenv = "^1.0.1"
-vfn-rag = {git = "https://github.com/Deltares-research/vfn-rag", tag = "0.2.0"}
+vfn-rag = {git = "https://github.com/Deltares-research/vfn-rag", tag = "0.3.0"}
 azure-keyvault-secrets = "^4.10.0"
 azure-identity = "^1.19.0"
 fastapi = "^0.104.1"
