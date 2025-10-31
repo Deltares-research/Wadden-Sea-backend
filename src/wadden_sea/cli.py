@@ -27,7 +27,7 @@ def hello(name: str):
 
 @cli.command()
 @click.option('--query', required=True, help='Query to process')
-@click.option('--entity', required=True, help='Entity to query (e.g., seal, seagrass)')
+@click.option('--entity', required=True, help='Entity to query (e.g., shellfish, seagrass)')
 def query(query: str, entity: str):
     """Process a RAG query for a specific entity"""
     try:

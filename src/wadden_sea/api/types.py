@@ -44,7 +44,7 @@ def get_entity_config(entity: str) -> EntityConfig:
     Parameters
     ----------
     entity: str
-        The entity name (e.g., 'seal', 'seagrass')
+        The entity name (e.g., 'shellfish', 'seagrass')
     
     Returns
     -------
