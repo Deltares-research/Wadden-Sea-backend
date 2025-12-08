@@ -15,11 +15,14 @@ class EntityConfig(NamedTuple):
             The container name within the database
         description:
             Human-readable description of the entity
+        simple_query:
+            Whether to use simple LLM querying without RAG
     """
     grounded_prompt: Optional[str]
     database_name: str
     container_name: str
     description: str
+    simple_query: Optional[bool] = False
 
 
 ENTITY_MAPPING = {
@@ -34,6 +37,20 @@ ENTITY_MAPPING = {
         database_name="vectorSearchDB",
         container_name="seagrassContainer",
         description="Seagrass knowledge base"
+    ),
+    "seal": EntityConfig(
+        grounded_prompt="Pretend that you are a seal in the wadden sea.",
+        database_name="",
+        container_name="",
+        description="Basic seal knowledge (no RAG)",
+        simple_query=True
+    ),
+    "oyster": EntityConfig(
+        grounded_prompt="Pretend that you are an oyster in the wadden sea.",
+        database_name="",
+        container_name="",
+        description="Basic oyster knowledge (no RAG)",
+        simple_query=True
     ),
 }
 
