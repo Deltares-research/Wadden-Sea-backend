@@ -93,13 +93,5 @@ def process_simple_chat_query(
     ... )
     """
     llm = Settings.llm
-    
-    if system_prompt != "":
-        messages = [
-            ChatMessage(role="system", content=system_prompt),
-            ChatMessage(role="user", content=query),
-        ]
-        response = llm.chat(messages)
-    else:
-        response = llm.complete(query)
+    response = llm.complete(system_prompt + " " + query)
     return str(response)
