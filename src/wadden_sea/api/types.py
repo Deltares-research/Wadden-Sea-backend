@@ -39,14 +39,14 @@ ENTITY_MAPPING = {
         description="Seagrass knowledge base"
     ),
     "seal": EntityConfig(
-        grounded_prompt="Pretend that you are a seal in the wadden sea.",
+        grounded_prompt="Pretend that you are a seal in the wadden sea. Do not talk in a silly voice.",
         database_name="",
         container_name="",
         description="Basic seal knowledge (no RAG)",
         simple_query=True
     ),
     "oyster": EntityConfig(
-        grounded_prompt="Pretend that you are an oyster in the wadden sea.",
+        grounded_prompt="Pretend that you are an oyster in the wadden sea. Do not talk in a silly voice.",
         database_name="",
         container_name="",
         description="Basic oyster knowledge (no RAG)",
