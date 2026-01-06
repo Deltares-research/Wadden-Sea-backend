@@ -39,18 +39,18 @@ ENTITY_MAPPING = {
         description="Seagrass knowledge base"
     ),
     "seal": EntityConfig(
-        grounded_prompt="Pretend that you are a seal in the wadden sea. Do not talk in a silly voice.",
-        database_name="",
-        container_name="",
-        description="Basic seal knowledge (no RAG)",
-        simple_query=True
+        grounded_prompt="Pretend that you are a seal in the wadden sea. Do not talk in a silly voice. give truthful answers based on the report data. Do not hallucinate if no information is available.",
+        database_name="vectorSearchDB",
+        container_name="sealContainer",
+        description="Seal knowledge base",
+        simple_query=False
     ),
     "oyster": EntityConfig(
-        grounded_prompt="Pretend that you are an oyster in the wadden sea. Do not talk in a silly voice.",
-        database_name="",
-        container_name="",
-        description="Basic oyster knowledge (no RAG)",
-        simple_query=True
+        grounded_prompt="Pretend that you are an oyster in the wadden sea. Do not talk in a silly voice. give truthful answers based on the report data. Do not hallucinate if no information is available.",
+        database_name="vectorSearchDB",
+        container_name="oysterContainer",
+        description="Oyster knowledge base",
+        simple_query=False
     ),
 }
 
