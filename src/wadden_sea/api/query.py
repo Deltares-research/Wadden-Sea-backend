@@ -84,10 +84,10 @@ def process_simple_chat_query(
     
     Examples
     --------
-    >>> result = process_chat_query("What is the capital of France?")
+    >>> result = process_simple_chat_query("What is the capital of France?")
     >>> print(result)
     
-    >>> result = process_chat_query(
+    >>> result = process_simple_chat_query(
     ...     "Explain this code",
     ...     system_prompt="You are a helpful coding assistant."
     ... )
