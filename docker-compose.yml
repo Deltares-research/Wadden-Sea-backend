@@ -1,6 +1,7 @@
 services:
   wadden-sea:
     build: .
+    image: wadden-sea-backend:latest
     ports:
       - "80:80"
     environment:
