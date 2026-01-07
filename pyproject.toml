@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Wadden-Sea-backend"
-version = "0.1.0"
+version = "0.2.0"
 description = "Overall package"
 authors = ["Mostafa Farrag <mostafa.farrag@deltares.nl>"]
 license = "Proprietary"
