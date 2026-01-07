@@ -28,21 +28,26 @@ jobs:
         fi
         echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
         echo "Version: ${VERSION}"
+
     - name: Tag Docker image
       run: |
-        docker tag wadden-sea-backend_wadden-sea:latest ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.get-version.outputs.VERSION }}
-        docker tag wadden-sea-backend_wadden-sea:latest ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:latest
+        docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.get-version.outputs.VERSION }}
+        docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:latest
         # to be removed when fixing the wadden-sea-backend image in ACR
-        docker tag wadden-sea-backend_wadden-sea:latest ${{ env.REGISTRY_URL }}/vfn-rag:latest
+        docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.REGISTRY_URL }}/vfn-rag:latest
+
     - name: Login to Azure Container Registry
       run: |
         docker login ${{ env.REGISTRY_URL }} -u ${{ secrets.ACR_USERNAME }} -p ${{ secrets.ACR_PASSWORD }}
+
     - name: Push images to Azure Container Registry
       run: |
-        # docker push ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.get-version.outputs.VERSION }}
-        # docker push ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:latest
+        docker push ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.get-version.outputs.VERSION }}
+        docker push ${{ env.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:latest
+
         # to be removed when fixing the wadden-sea-backend image in ACR
-        docker push waddencr.azurecr.io/vfn-rag:latest
+        docker push ${{ env.REGISTRY_URL }}/vfn-rag:latest
+
     - name: Show pushed images
       run: |
         echo "Successfully pushed:"
