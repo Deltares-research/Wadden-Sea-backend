@@ -10,6 +10,7 @@ jobs:
     env:
       REGISTRY_URL: waddencr.azurecr.io 
       IMAGE_NAME: wadden-sea-backend
+      REGISTRY_NAME: waddencr
 
     steps:
     - name: Checkout code
@@ -36,9 +37,13 @@ jobs:
         # to be removed when fixing the wadden-sea-backend image in ACR
         docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.REGISTRY_URL }}/vfn-rag:latest
 
-    - name: Login to Azure Container Registry
-      run: |
-        docker login ${{ env.REGISTRY_URL }} -u ${{ secrets.ACR_USERNAME }} -p ${{ secrets.ACR_PASSWORD }}
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURECR_PUSH_SERVICE_PRINCIPAL }}
+
+    - name: Login to ACR
+      run: az acr login --name ${{ env.REGISTRY_NAME }}
 
     - name: Push images to Azure Container Registry
       run: |
